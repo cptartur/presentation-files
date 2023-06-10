@@ -7,43 +7,17 @@ contract Voting {
         uint256 votesReceived;
     }
 
-    event UserVoted(address addr, address recipient);
-    event CandidateRegistered(Candidate candidate);
-    event CandidateRemoved(Candidate candidate);
-
-    error CandidateNotFound(address addr);
-    error UserAlreadyVoted(address voter);
-    error NoCandidatesRegistered();
-
     mapping(address => bool) public userVoted;
     Candidate[] public candidates;
 
-    address public owner;
-
-    constructor() {
-        owner = msg.sender;
-    }
-
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Not an owner");
-        _;
-    }
-
-
-    function transferOwnership(address newOwner) public onlyOwner {
-        owner = newOwner;
-    }
-
-    function registerCandidate(string calldata name, address addr) public onlyOwner {
+    function registerCandidate(string calldata name, address addr) public {
         Candidate memory candidate = Candidate(name, addr, 0);
         candidates.push(candidate);
-        emit CandidateRegistered(candidate);
     }
 
-    function removeCandidate(address addr) public onlyOwner {
+    function removeCandidate(address addr) public {
         for (uint i = 0; i < candidates.length; i++) {
             if (candidates[i].addr == addr) {
-                emit CandidateRemoved(candidates[i]);
 
                 candidates[i] = candidates[candidates.length - 1];
                 candidates.pop();
@@ -61,18 +35,17 @@ contract Voting {
     function vote(address addr) public {
         address from = msg.sender;
         if (didVote(from)) {
-            revert UserAlreadyVoted(from);
+            revert("User already voted");
         }
         userVoted[from] = true;
 
         Candidate storage candidate = getCandidate(addr);
         candidate.votesReceived++;
-        emit UserVoted(from, addr);
     }
 
     function getWinner() public view returns (Candidate memory) {
         if (candidates.length == 0) {
-            revert NoCandidatesRegistered();
+            revert("No candidates registered");
         }
 
         Candidate memory winner = candidates[0];
@@ -95,6 +68,6 @@ contract Voting {
                 return candidates[i];
             }
         }
-        revert CandidateNotFound(addr);
+        revert("Candidate not found");
     }
 }
