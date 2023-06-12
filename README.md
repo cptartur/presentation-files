@@ -52,3 +52,9 @@ Interact with your contract
 ```shell
 npx hardhat run scripts/...
 ```
+
+## Exercises
+
+1. Right now, every account can vote. Implement a solution that limit voters to addresses manually approved by the
+   owner.
+2. Extend candidate struct so it includes a `bio` section. Add method that allows candidates to update their bios.
