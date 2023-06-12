@@ -7,7 +7,6 @@ contract Voting {
         uint256 votesReceived;
     }
 
-    mapping(address => bool) public userVoted;
     Candidate[] public candidates;
 
     constructor() {
@@ -23,12 +22,6 @@ contract Voting {
     }
 
     function vote(address addr) public {
-        address from = msg.sender;
-        if (didVote(from)) {
-            revert("User already voted");
-        }
-        userVoted[from] = true;
-
         Candidate storage candidate = getCandidate(addr);
         candidate.votesReceived++;
     }
@@ -46,10 +39,6 @@ contract Voting {
         }
 
         return winner;
-    }
-
-    function didVote(address addr) private view returns (bool) {
-        return userVoted[addr];
     }
 
     function getCandidate(address addr) private view returns (Candidate storage) {
